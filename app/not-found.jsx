@@ -1,0 +1,1 @@
+export default function NotFound(){return <main id="main" className="container section"><span className="eyebrow">A SMALL DETOUR</span><h1>This page is unavailable.</h1><p>It may have moved or may not be published yet.</p><a className="button" href="/">Return to the academy →</a></main>}

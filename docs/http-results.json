@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-10-23T11:57:37.109Z",
+  "checks": [
+    "public pages and security headers",
+    "all admin workspaces render",
+    "unauthenticated and student mutations denied",
+    "editor cannot change admin settings",
+    "cross-origin mutations rejected",
+    "unsafe menu links rejected",
+    "folder persistence and cycle prevention",
+    "question save and answer boundary validation",
+    "CSV validation, atomic commit and replay protection",
+    "server-owned attempt snapshot hides answers",
+    "attempt ownership and server-side grading",
+    "expired attempt ignores late answer changes",
+    "PDF validation, permission and private delivery",
+    "unpublished parent hides child sets"
+  ]
+}

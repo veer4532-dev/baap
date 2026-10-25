@@ -1,0 +1,7 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtempSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+import {spawnSync} from 'node:child_process';
+test('fresh CMS defaults initialize once and preserve edited and archived pages',()=>{const dir=mkdtempSync(path.join(tmpdir(),'baa-qa-cms-'));const first=spawnSync(process.execPath,['--input-type=module','-e',`import {all,run} from './lib/db.mjs';if(all("SELECT * FROM site_content WHERE kind='page'").length!==6)throw Error('Page defaults');if(all("SELECT * FROM site_content WHERE kind='category'").length!==4)throw Error('Category defaults');if(all("SELECT * FROM site_content WHERE kind='video'").length!==0)throw Error('Unexpected video');run("UPDATE site_content SET title='Owner edit',status='archived' WHERE slug='privacy'");`],{env:{...process.env,DATA_DIR:dir},encoding:'utf8'});assert.equal(first.status,0,first.stderr);const second=spawnSync(process.execPath,['--input-type=module','-e',`import {all,one} from './lib/db.mjs';if(all("SELECT * FROM site_content WHERE kind='page'").length!==6)throw Error('Duplicate defaults');const p=one("SELECT * FROM site_content WHERE slug='privacy'");if(p.title!=='Owner edit'||p.status!=='archived')throw Error('Owner edits overwritten');`],{env:{...process.env,DATA_DIR:dir},encoding:'utf8'});assert.equal(second.status,0,second.stderr)});

@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {parseQuestions,score,question,safePath} from '../lib/model.mjs';
+import {passwordHash,passwordMatches} from '../lib/auth-password.mjs';
+test('CSV handles BOM, Hindi, quoted commas and multiline explanations',()=>{const r=parseQuestions('\uFEFFprompt,option_a,option_b,correct,explanation\r\n"मिट्टी, soil?",A,B,B,"Two\nlines"');assert.equal(r.length,1);assert.equal(r[0].data.correct,1);assert.equal(r[0].data.explanation,'Two\nlines')});
+test('CSV rejects nonexistent answer option and malformed quotes',()=>{assert.ok(parseQuestions('prompt,option_a,option_b,correct\nQ,A,B,E')[0].error);assert.throws(()=>parseQuestions('prompt,option_a\n"unterminated,A'))});
+test('questions reject blank and out of range answers',()=>{assert.throws(()=>question({prompt:'Q',options:['a',''],correct:0}));assert.throws(()=>question({prompt:'Q',options:['a','b'],correct:2}))});
+test('grading handles wrong, unanswered and invalid selections',()=>{const snapshot=[{id:1,options:['a','b'],correct:0},{id:2,options:['a','b'],correct:1},{id:3,options:['a','b'],correct:0}];assert.deepEqual(Object.fromEntries(Object.entries(score(snapshot,{1:0,2:0,3:999})).filter(([k])=>k!=='review')),{correct:1,total:3,unanswered:1})});
+test('passwords are salted, checked and length bounded',()=>{const p='long-private-test-password';const a=passwordHash(p),b=passwordHash(p);assert.notEqual(a,b);assert.ok(passwordMatches(p,a));assert.equal(passwordMatches('wrong',a),false);assert.throws(()=>passwordHash('short'))});
+test('redirects cannot escape the website',()=>{assert.equal(safePath('//evil.example'),'/');assert.equal(safePath('javascript:alert(1)'),'/');assert.equal(safePath('/library?q=soil'),'/library?q=soil')});

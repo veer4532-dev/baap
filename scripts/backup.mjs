@@ -1,0 +1,4 @@
+import {mkdirSync,cpSync,existsSync} from 'node:fs';
+import path from 'node:path';
+import {db} from '../lib/db.mjs';
+const target=process.argv[2];if(!target)throw Error('Provide an absolute backup directory outside the public website.');if(!path.isAbsolute(target))throw Error('Use an absolute path.');const dir=path.join(target,'academy-'+new Date().toISOString().replace(/[:.]/g,'-'));mkdirSync(dir,{recursive:true,mode:0o700});db().prepare('VACUUM INTO ?').run(path.join(dir,'academy.sqlite'));const uploads=path.resolve(process.env.DATA_DIR||'data','uploads');if(existsSync(uploads))cpSync(uploads,path.join(dir,'uploads'),{recursive:true});console.log('Database snapshot and available uploads saved to '+dir);console.log('If uploads changed during backup, repeat during a maintenance window for a fully consistent file/database pair.');

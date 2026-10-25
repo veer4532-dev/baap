@@ -1,0 +1,8 @@
+import {redirect} from 'next/navigation';
+import {PublicShell,ArticleCard} from '../../components/public';
+import {Logout} from '../../components/ui';
+import PasswordForm from '../../components/password-form';
+import {currentUser} from '../../lib/auth.mjs';
+import {all} from '../../lib/db.mjs';
+export const metadata={title:'My learning',robots:{index:false,follow:false}};
+export default async function Account(){const u=await currentUser();if(!u)redirect('/login');const saved=all("SELECT a.* FROM articles a JOIN bookmarks b ON b.article_id=a.id WHERE b.user_id=? AND a.status='published' ORDER BY a.id DESC",u.id),attempts=all('SELECT a.id,a.started,a.submitted,a.result,f.name FROM attempts a JOIN folders f ON f.id=a.folder_id WHERE a.user_id=? ORDER BY a.id DESC LIMIT 50',u.id);return <PublicShell><section className="container section"><div className="section-heading"><div><span className="eyebrow">YOUR LEARNING SPACE</span><h1>Hello, {u.name}.</h1></div><Logout/></div><h2>Saved topics</h2>{saved.length?<div className="article-grid">{saved.map(a=><ArticleCard key={a.id} a={a}/>)}</div>:<p className="muted">Save a topic from the learning library to find it here.</p>}<div className="panel"><h2>Your practice history</h2>{attempts.map(a=><a className="history-row" href={'/attempt/'+a.id} key={a.id}><span>{a.name}<small>{new Date(a.started).toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata'})}</small></span><span>{a.submitted?`${JSON.parse(a.result).correct} / ${JSON.parse(a.result).total}`:'Resume'} →</span></a>)}{!attempts.length&&<p>Your first practice session starts <a href="/practice">here</a>.</p>}</div><PasswordForm/></section></PublicShell>}

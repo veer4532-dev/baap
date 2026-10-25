@@ -1,0 +1,23 @@
+[Unit]
+Description=Bihar Agriculture Academy Next.js
+After=network.target
+
+[Service]
+Type=simple
+User=academy
+Group=academy
+WorkingDirectory=/srv/bihar-academy-next
+Environment=NODE_ENV=production
+EnvironmentFile=/srv/bihar-academy-next/.env
+ExecStart=/usr/bin/node /srv/bihar-academy-next/node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 3000
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+ReadWritePaths=/var/lib/bihar-academy /srv/bihar-academy-next/.next
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,4 @@
+'use client';
+import {useState} from 'react';
+import {changePassword} from '../lib/actions';
+export default function PasswordForm(){const [message,setMessage]=useState(''),[pending,setPending]=useState(false);return <form className="panel" onSubmit={async e=>{e.preventDefault();const form=e.currentTarget;setPending(true);try{const r=await changePassword(Object.fromEntries(new FormData(form)));setMessage(r.error||'Password changed. Other sessions have been signed out.');if(r.ok)form.reset()}finally{setPending(false)}}}><h2>Change password</h2><div className="form-grid"><label>Current password<input type="password" name="current" autoComplete="current-password" required maxLength={128}/></label><label>New password<input type="password" name="password" minLength={12} maxLength={128} autoComplete="new-password" required/></label></div><button disabled={pending}>Update password</button><p role="status">{message}</p></form>}

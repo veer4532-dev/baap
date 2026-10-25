@@ -1,0 +1,5 @@
+'use client';
+import {useActionState,useEffect} from 'react';
+import {useRouter} from 'next/navigation';
+import {authenticate,register} from '../lib/actions';
+export function AuthForm({signup=false}){const [state,action,pending]=useActionState(signup?register:authenticate,{}),r=useRouter();useEffect(()=>{if(state.ok){r.push(state.role==='student'?'/account':'/admin');r.refresh()}},[state,r]);return <form action={action} className="auth-form">{signup&&<label>Your name<input name="name" maxLength={100} autoComplete="name" required/></label>}<label>Email address<input name="email" type="email" maxLength={190} autoComplete="username" required/></label><label>Password<input name="password" type="password" minLength={signup?12:1} maxLength={128} autoComplete={signup?'new-password':'current-password'} required/></label>{signup&&<small>Use at least 12 characters.</small>}{state.error&&<p className="error" role="alert">{state.error}</p>}<button disabled={pending}>{pending?'Please wait…':signup?'Create my learning account':'Sign in'} ↗</button></form>}
